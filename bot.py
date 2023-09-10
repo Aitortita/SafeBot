@@ -20,6 +20,9 @@ def run_discord_bot():
     @client.event
     async def on_ready():
         print(f'{client.user} is now running!')
+        # Set bot status
+        game = discord.Game("Protecting you")
+        await client.change_presence(status=discord.Status.idle, activity=game)
 
     @client.event
     async def on_message(message):
@@ -35,7 +38,7 @@ def run_discord_bot():
         if isinstance(message.channel, discord.DMChannel):
             return await send_message(message, user_message, is_private=True)
 
-        if user_message[0] == '!':
+        if user_message[0] == '#':
             user_message = user_message[1:]
             await send_message(message, user_message, is_private=True)
         else:
