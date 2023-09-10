@@ -5,7 +5,7 @@ import vt
 import json
 
 def configure():
-        load_dotenv()
+    load_dotenv()
 configure()
 api_key: str = os.getenv('API_KEY')
 client = vt.Client(api_key)
