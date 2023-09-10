@@ -3,7 +3,10 @@ import bot
 import os
 
 def configure():
-        load_dotenv()
+        try:
+            load_dotenv()
+        except:
+            print("MAN Test failed")
 
 def main():
     configure()
