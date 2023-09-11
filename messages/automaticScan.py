@@ -4,6 +4,7 @@ import vt
 import json
 import discord
 from discord.ext import commands
+from utils.vtScanResponseInterface import Response
 
 client = vt.Client(settings.VIRUSTOTAL_API_KEY)
 
@@ -50,8 +51,8 @@ async def handle_response(user_message: str, is_private: bool) -> str:
     if urls:
         try:
             url_id = vt.url_id(urls[0])
-            url = await client.get_object_async("/urls/{}", url_id)
-            return f"```json\n{json.dumps(url.last_analysis_stats, indent=4)}\n```"
+            response: Response = await client.get_object_async("/urls/{}", url_id)
+            print(response.reputation)
         except Exception as error:
             print(f"An unexpected error occurred: {str(error)}")
             return(f"An unexpected error occurred: {str(error)}")
