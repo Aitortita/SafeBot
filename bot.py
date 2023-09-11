@@ -1,47 +1,57 @@
+import settings
 import discord
-import responses
-import os
+from discord.ext import commands
+from logging import getLogger
 
-async def send_message(message, user_message, is_private):
-        response = await responses.handle_response(user_message, is_private)
-        if not response:
-            return
-        await message.author.send(response) if is_private else await message.channel.send(response)
+logger = getLogger("bot")
+
+intents = discord.Intents.default()  # Create a default intents instance
+intents.typing = False  # Disable the typing event
+intents.presences = False  # Disable presence-related events
+intents.message_content = True
+
+async def get_prefix(bot: commands.Bot, message: discord.Message):
+    return '#'
 
 def run_discord_bot():
-    TOKEN = os.getenv('TOKEN')
-    intents = discord.Intents.default()  # Create a default intents instance
-    intents.typing = False  # Disable the typing event
-    intents.presences = False  # Disable presence-related events
-    intents.message_content = True
 
-    client = discord.Client(intents=intents)  # Pass the intents when creating the client
+    bot = commands.Bot(command_prefix=(get_prefix), intents=intents)
 
-    @client.event
+    @bot.event
     async def on_ready():
-        print(f'{client.user} is now running!')
+        logger.info(f"Bot: {bot.user} (ID: {bot.user.id}) is now running")
+
         # Set bot status
         game = discord.Game("Protecting you")
-        await client.change_presence(status=discord.Status.idle, activity=game)
+        await bot.change_presence(status=discord.Status.idle, activity=game)
 
-    @client.event
-    async def on_message(message):
-        if message.author == client.user:
-            return # Ignore messages sent by the bot
-        
-        username = str(message.author)
-        user_message = str(message.content)
-        channel = str(message.channel)
+        # import modularized Cogs
+        for message_file in settings.MESSAGES_DIR.glob("*.py"):
+            if message_file.name != "__init__.py":
+                await bot.load_extension(f"messages.{message_file.name[:-3]}")
 
-        print(f"{username} said: '{user_message}' ({channel})")
+    @bot.event
+    async def on_command_error(ctx: commands.Context, error):
+         if isinstance(error, commands.MissingRequiredArgument):
+            await ctx.send("Missing required argument", ephemeral=True)
 
-        if isinstance(message.channel, discord.DMChannel):
-            return await send_message(message, user_message, is_private=True)
+    class InviteButtons(discord.ui.View):
+            def __init__(self, inv: str):
+                super().__init__()
+                self.inv = inv
+                self.add_item(discord.ui.Button(label="Invite Link", url=self.inv))
 
-        if user_message[0] == '#':
-            user_message = user_message[1:]
-            await send_message(message, user_message, is_private=True)
-        else:
-            await send_message(message, user_message, is_private=False)
+            @discord.ui.button(label="Invite Btn", style=discord.ButtonStyle.blurple)
+            async def inviteBtn(self, interaction: discord.Interaction, button: discord.ui.Button):
+                await interaction.response.send_message(self.inv, ephemeral=True)
 
-    client.run(TOKEN)
+    @bot.command()
+    async def invite(ctx: commands.Context):
+        inv = "https://discord.gg/5fpCmgRGV2"
+        await ctx.send("Click the buttons below to invite someone!", view=InviteButtons(str(inv)))
+
+    @bot.command()
+    async def ping(ctx: commands.Context):
+        await ctx.send("pong")
+
+    bot.run(settings.DISCORD_API_TOKEN, root_logger=True)
