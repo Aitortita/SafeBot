@@ -47,22 +47,19 @@ def extract_urls(message):
 async def handle_response(user_message: str, is_private: bool) -> str:
     p_message = user_message
     urls = extract_urls(p_message)
-
     if urls:
         try:
+            antivirusFlags = {}
             url_id = vt.url_id(urls[0])
             response: Response = await client.get_object_async("/urls/{}", url_id)
-            print(response.reputation)
+            for antivirus, detection_result in response.last_analysis_results.items():
+                 if detection_result["result"] == "phishing" or detection_result["result"] == "malicious":
+                    antivirusFlags[antivirus] = detection_result["result"]
+            if len(antivirusFlags) >= 1:
+                return (f"the url {response.last_final_url} is malicious, don't click it.\nHere is a list of the antivirus that listed it as malicious: ```json\n{json.dumps(antivirusFlags, indent=3)}\n```")
         except Exception as error:
-            print(f"An unexpected error occurred: {str(error)}")
-            return(f"An unexpected error occurred: {str(error)}")
-    
-    if p_message == 'hello':
-        return 'Hey there!'
+            print(error)
 
-    if p_message == 'help' and is_private:
-        return "`This is a help message that you can modify.`"
-    
     return
 
 async def setup(bot):
