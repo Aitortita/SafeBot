@@ -1,6 +1,4 @@
 ### Python ###
-*.log
-.log
 *.pyc
 __pycache__
 
@@ -9,3 +7,7 @@ __pycache__
 
 ### Virtual Environment ###
 venv/
+
+.log
+logs/.logs
+logs/infos.log
