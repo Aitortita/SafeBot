@@ -1,66 +1,86 @@
 import settings
-import re
-import vt
 import json
 import discord
+import requests
+import time
 from discord.ext import commands
-from utils.vtScanResponseInterface import Response
+from utils.functions.extractUrls import extract_urls
+from utils.functions.urlIdGenerator import url_id_generator
 
-client = vt.Client(settings.VIRUSTOTAL_API_KEY)
+headers = {
+    "accept": "application/json",
+    "X-Apikey": settings.VIRUSTOTAL_API_KEY
+}
 
+malicious: str = 'malicious'
+clean: str = 'clean'
+queued: str = 'queued'
+
+# Cog modularization for discord.py
 class automaticScans(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
     @commands.Cog.listener()
-    @commands.check(lambda message: not message.content.startswith('#'))
-    async def on_message(self, message):
+    async def on_message(self, message: discord.Message):
         if message.author == self.bot.user:
             return # Ignore messages sent by the bot
-        
-        user_name = str(message.author)
-        user_message = str(message.content)
-        channel = str(message.channel)
-        discord_name = str(message.guild)
-        print(f"{user_name} said: '{user_message}' ({channel}-{discord_name})")
-        
-        if isinstance(message.channel, discord.DMChannel):
-            return await send_message(message, user_message, is_private=True)
-        await send_message(message, user_message, is_private=False)
+        if message.content.startswith('#'):
+            return # Ignore message sent with prefix #
+        # filters urls from message content
+        urls = extract_urls(message.content)
+        if urls:
+            await handle_urls(message, urls)
 
-async def send_message(message, user_message, is_private):
+async def handle_urls(message: discord.Message, urls):
         try:
-            response = await handle_response(user_message, is_private)
-            if not response:
-                return
-            await message.author.send(response) if is_private else await message.channel.send(response)
+            await message.add_reaction('🔍')
+            results = await urlScan(urls)
+            await message.clear_reaction('🔍')
+            if results['status'] == clean:
+                await message.add_reaction('✅')
+            if results['status'] == malicious:
+                await message.add_reaction('❗')
+                await message.channel.send(results['message'])
         except Exception as error:
-            print(f"error: ${error}")
-
-# function to extract urls from user's messages
-def extract_urls(message):
-    url_pattern = re.compile(r'https?://\S+|www\.\S+')
-    urls = url_pattern.findall(message)
-    return urls
-
-# main response function
-async def handle_response(user_message: str, is_private: bool) -> str:
-    p_message = user_message
-    urls = extract_urls(p_message)
-    if urls:
-        try:
-            antivirusFlags = {}
-            url_id = vt.url_id(urls[0])
-            response: Response = await client.get_object_async("/urls/{}", url_id)
-            for antivirus, detection_result in response.last_analysis_results.items():
-                 if detection_result["result"] == "phishing" or detection_result["result"] == "malicious":
-                    antivirusFlags[antivirus] = detection_result["result"]
-            if len(antivirusFlags) >= 1:
-                return (f"the url {response.last_final_url} is malicious, don't click it.\nHere is a list of the antivirus that listed it as malicious: ```json\n{json.dumps(antivirusFlags, indent=3)}\n```")
-        except Exception as error:
+            await message.clear_reactions()
+            await message.add_reaction('❓')
             print(error)
 
-    return
+# automatic scan function using requests on virus total api
+async def urlScan(urls: list) -> dict:
+    """
+  This function scans a list of URLs and returns the results.o
 
-async def setup(bot):
+  Args:
+    urls: A list of URLs to scan.
+
+  Returns:
+    A Dict containing the results of the scan.
+  """
+    antivirusFlags = {}
+    url_id = url_id_generator(urls[0])
+    analysis = requests.post(f"https://www.virustotal.com/api/v3/urls/{url_id}/analyse", headers=headers).json()
+    time.sleep(5)
+    response = requests.get(f"https://www.virustotal.com/api/v3/analyses/{analysis['data']['id']}", headers=headers).json()
+    while response['data']['attributes']['status'] == "queued":
+        time.sleep(3)
+        response = requests.get(f"https://www.virustotal.com/api/v3/analyses/{analysis['data']['id']}", headers=headers).json()
+    for antivirus, detection_result in response['data']['attributes']['results'].items():
+        if detection_result["result"] == "phishing" or detection_result["result"] == "malicious":
+            antivirusFlags[antivirus] = detection_result["result"]
+    if len(antivirusFlags) >= 1:
+        return {
+            'status': malicious,
+            'message': f"the url '{response['meta']['url_info']['url']}' is malicious, don't click it.\nHere is a list of the antivirus that listed it as malicious: ```json\n{json.dumps(antivirusFlags, indent=3)}\n```"
+        }
+    if response['data']['attributes']['status'] == 'queued':
+        return {
+            'status': queued
+        }
+    return {
+        'status': clean
+    }
+
+async def setup(bot: commands.Bot):
     await bot.add_cog(automaticScans(bot))
