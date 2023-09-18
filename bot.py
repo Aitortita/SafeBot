@@ -20,7 +20,7 @@ def run_discord_bot():
     @bot.event
     async def on_ready():
         logger.info(f"Bot: {bot.user} (ID: {bot.user.id}) is now running")
-
+        await bot.tree.sync()
         # Set bot status
         game = discord.Game("Protecting you")
         await bot.change_presence(status=discord.Status.idle, activity=game)
@@ -45,12 +45,12 @@ def run_discord_bot():
             async def inviteBtn(self, interaction: discord.Interaction, button: discord.ui.Button):
                 await interaction.response.send_message(self.inv, ephemeral=True)
 
-    @bot.command()
+    @bot.hybrid_command()
     async def invite(ctx: commands.Context):
         inv = "https://discord.gg/5fpCmgRGV2"
         await ctx.send("Click the buttons below to invite someone!", view=InviteButtons(str(inv)))
 
-    @bot.command()
+    @bot.hybrid_command()
     async def ping(ctx: commands.Context):
         await ctx.send("pong")
 
