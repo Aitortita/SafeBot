@@ -58,29 +58,55 @@ async def urlScan(urls: list) -> dict:
   Returns:
     A Dict containing the results of the scan.
   """
+    url_ids = url_id_generator(urls)
+    # print(url_ids)
     antivirusFlags = {}
-    url_id = url_id_generator(urls[0])
-    analysis = requests.post(f"https://www.virustotal.com/api/v3/urls/{url_id}/analyse", headers=headers).json()
-    time.sleep(5)
-    response = requests.get(f"https://www.virustotal.com/api/v3/analyses/{analysis['data']['id']}", headers=headers).json()
-    while response['data']['attributes']['status'] == "queued":
-        time.sleep(3)
-        response = requests.get(f"https://www.virustotal.com/api/v3/analyses/{analysis['data']['id']}", headers=headers).json()
-    for antivirus, detection_result in response['data']['attributes']['results'].items():
-        if detection_result["result"] == "phishing" or detection_result["result"] == "malicious":
-            antivirusFlags[antivirus] = detection_result["result"]
-    if len(antivirusFlags) >= 1:
-        return {
-            'status': malicious,
-            'message': f"the url '{response['meta']['url_info']['url']}' is malicious, don't click it.\nHere is a list of the antivirus that listed it as malicious: ```json\n{json.dumps(antivirusFlags, indent=3)}\n```"
-        }
-    if response['data']['attributes']['status'] == 'queued':
-        return {
-            'status': queued
-        }
-    return {
-        'status': clean
-    }
+    # async with requests.Session() as session:
+    #         for url_id in url_ids:
+    try:
+        response = requests.get(f"https://www.virustotal.com/api/v3/urls/{url_ids[0]}", headers=headers)
+        if(response.status_code == 200):
+            analysis = requests.post(f"https://www.virustotal.com/api/v3/urls/{url_ids[0]}/analyse", headers=headers)
+            if (analysis.status_code == 200):
+                response = requests.get(f"https://www.virustotal.com/api/v3/analyses/{analysis.json()['data']['id']}", headers=headers)
+                while response.json()['data']['attributes']['status'] == "queued":
+                    time.sleep(2)
+                    response = requests.get(f"https://www.virustotal.com/api/v3/analyses/{analysis.json()['data']['id']}", headers=headers)
+                for antivirus, detection_result in response.json()['data']['attributes']['results'].items():
+                    if detection_result["result"] == "phishing" or detection_result["result"] == "malicious":
+                        antivirusFlags[antivirus] = detection_result["result"]
+                if len(antivirusFlags) >= 1:
+                    return {
+                        'status': malicious,
+                        'message': f"the url '{response.json()['meta']['url_info']['url']}' is malicious, don't click it.\nHere is a list of the antivirus that listed it as malicious: ```json\n{json.dumps(antivirusFlags, indent=3)}\n```"
+                    }
+                return {
+                    'status': clean
+                }
+        else:
+            analysis = requests.post("https://www.virustotal.com/api/v3/urls", data={ "url": urls[0] }, headers={
+                "accept": "application/json",
+                "X-Apikey": settings.VIRUSTOTAL_API_KEY,
+                "content-type": "application/x-www-form-urlencoded"
+            })
+            if(analysis.status_code == 200):
+                response = requests.get(f"https://www.virustotal.com/api/v3/analyses/{analysis.json()['data']['id']}", headers=headers)
+                while response.json()['data']['attributes']['status'] == "queued":
+                    time.sleep(2)
+                    response = requests.get(f"https://www.virustotal.com/api/v3/analyses/{response.json()['data']['id']}", headers=headers)
+                for antivirus, detection_result in response.json()['data']['attributes']['results'].items():
+                    if detection_result["result"] == "phishing" or detection_result["result"] == "malicious":
+                        antivirusFlags[antivirus] = detection_result["result"]
+                if len(antivirusFlags) >= 1:
+                    return {
+                        'status': malicious,
+                        'message': f"the url '{response.json()['meta']['url_info']['url']}' is malicious, don't click it.\nHere is a list of the antivirus that listed it as malicious: ```json\n{json.dumps(antivirusFlags, indent=3)}\n```"
+                    }
+                return {
+                    'status': clean
+                }
+    except Exception as error:
+        print(error)
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(automaticScans(bot))
