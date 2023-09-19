@@ -30,15 +30,16 @@ async def scan_url(url: str) -> dict:
                 if(response.status == 200):
                     # If the request was successful it means that an already made analysis exists, so we need to ask VirusTotal to reanalize the URL in order to check if there have been any new discoveries to potential maliciousness.
                     analysis = await session.post(f"https://www.virustotal.com/api/v3/urls/{url_id}/analyse", headers=headers)
+                    analysis_json = await analysis.json()
 
                     # Wait for the analysis to complete.
                     if (analysis.status == 200):
-                        analysis_json = await analysis.json()
                         response = await session.get(f"https://www.virustotal.com/api/v3/analyses/{analysis_json['data']['id']}", headers=headers)
                         response_json = await response.json()
                         while response_json['data']['attributes']['status'] == queued:
                             await asyncio.sleep(2)
                             response = await session.get(f"https://www.virustotal.com/api/v3/analyses/{analysis_json['data']['id']}", headers=headers)
+                            response_json = await response.json()
                             
                         return handle_vt_analysis(response_json)
                 # If the request fails it means that there is no current analysis of the URL inside of VirusTotal Database
@@ -49,16 +50,18 @@ async def scan_url(url: str) -> dict:
                         "X-Apikey": settings.VIRUSTOTAL_API_KEY,
                         "content-type": "application/x-www-form-urlencoded"
                     })
+                    analysis_json = await analysis.json()
+
 
                     if(analysis.status == 200):
-                        analysis_json = await analysis.json()
                         # Wait for the analysis to complete.
                         response = await session.get(f"https://www.virustotal.com/api/v3/analyses/{analysis_json['data']['id']}", headers=headers)
                         response_json = await response.json()
                         while response_json['data']['attributes']['status'] == queued:
                             await asyncio.sleep(2)
                             response = await session.get(f"https://www.virustotal.com/api/v3/analyses/{analysis_json['data']['id']}", headers=headers)
+                            response_json = await response.json()
 
-                        handle_vt_analysis(response_json)
+                        return handle_vt_analysis(response_json)
         except Exception as error:
             print(error)
