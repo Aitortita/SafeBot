@@ -50,7 +50,7 @@ async def scan_urls(urls: list[str]) -> list[dict]:
 
   Returns:
     A list of dict containing the results of the scan.
-  """
+    """
     # Create a list of asynchronous scans to scan each URL.
     scans = [scan_url(url) for url in urls]
 
