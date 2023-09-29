@@ -5,7 +5,7 @@ from discord import app_commands
 class ScanCommands(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.name = "Scan Commands"
+        self.__cog_name__= "Scan commands"
         self.description = "Commands to scan domains, urls and files"
 
     @commands.hybrid_command(

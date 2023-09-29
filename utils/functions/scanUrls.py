@@ -1,4 +1,4 @@
-from utils.functions.scanUrl import scan_url
+from . import scan_url
 import asyncio
 
 # automatic scan function using requests on virus total api

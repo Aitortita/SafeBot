@@ -1,7 +1,6 @@
 import discord
 from discord.ext import commands
-from utils.functions.extractUrls import extract_urls
-from utils.functions.scanUrls import scan_urls
+from utils.functions import extract_urls, scan_urls
 
 # Cog modularization for AutomaticScans
 class AutomaticScans(commands.Cog):

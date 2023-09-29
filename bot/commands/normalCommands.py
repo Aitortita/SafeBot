@@ -15,7 +15,7 @@ class InviteButtons(discord.ui.View):
 class NormalCommands(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
-        self.__cog_name__= "normal commands"
+        self.__cog_name__= "Normal commands"
 
     @commands.hybrid_command()
     async def invite(self, ctx: commands.Context):

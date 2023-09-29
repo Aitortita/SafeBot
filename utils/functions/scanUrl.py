@@ -1,8 +1,8 @@
 import aiohttp
 import asyncio
-import settings
-from utils.functions.urlIdGenerator import url_id_generator
-from utils.functions.handleVtAnalysis import handle_vt_analysis
+import config.settings as settings
+from .urlIdGenerator import url_id_generator
+from .handleVtAnalysis import handle_vt_analysis
 
 headers = {
     "accept": "application/json",
