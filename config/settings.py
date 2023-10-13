@@ -1,4 +1,3 @@
-import pathlib
 import os
 from logging.config import dictConfig
 from dotenv import load_dotenv
@@ -7,12 +6,11 @@ load_dotenv()
 
 DISCORD_API_TOKEN: str = os.getenv("DISCORD_API_TOKEN")
 VIRUSTOTAL_API_KEY: str = os.getenv("VIRUSTOTAL_API_KEY")
-
-BASE_DIR = pathlib.Path(__file__).parent
-
-COMMANDS_DIR = BASE_DIR / "commands"
-
-MESSAGES_DIR = BASE_DIR / "messages"
+DBHOST: str = os.getenv("DBHOST")
+DBUSER: str = os.getenv("DBUSER")
+DBPASSWORD: str = os.getenv("DBPASSWORD")
+DBPORT: str = os.getenv("DBPORT")
+DBNAME: str = os.getenv("DBNAME")
 
 LOGGING_CONFIG = {
     "version": 1,
