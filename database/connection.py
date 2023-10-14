@@ -1,8 +1,7 @@
 from logging import getLogger
 import asyncio
 from config import settings
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 from database.models import Base
 logger = getLogger("bot")
 
@@ -13,17 +12,13 @@ DBHOST = settings.DBHOST
 DBNAME = settings.DBNAME
 
 # SQLAlchemy database URL for MySQL connection.
-db_url = f"mysql+aiomysql://{DBUSER}:{DBPASSWORD}@{DBHOST}/{DBNAME}"
+db_url = f"postgresql+asyncpg://{DBUSER}:{DBPASSWORD}@{DBHOST}/{DBNAME}"
 
 # Create the SQLAlchemy engine
 engine = create_async_engine(db_url, echo=True, future=True)
 
 # Create a sessionmaker that produces async sessions
-async_session = sessionmaker(
-    bind=engine,
-    class_=AsyncSession,
-    expire_on_commit=False,
-)
+async_session = async_sessionmaker(engine, expire_on_commit=False)
 
 # Run an asynchronous function to create tables in the database
 async def create_tables():
