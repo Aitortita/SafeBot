@@ -1,6 +1,5 @@
 from bot import SafeBot
-import database
-
+       
 if __name__ == '__main__':
     try:
         # Create bot instance
