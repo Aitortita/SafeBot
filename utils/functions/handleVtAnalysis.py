@@ -15,11 +15,12 @@ def handle_vt_analysis(analysis: json) -> dict:
     if len(antivirusFlags) >= 1:
         return {
             'status': malicious,
-            'message': f"the url '{analysis['meta']['url_info']['url']}' is malicious, don't click it.\nHere is a list of the antivirus that listed it as malicious: ```json\n{json.dumps(antivirusFlags, indent=3)}\n```"
+            'message': f"The url '{analysis['meta']['url_info']['url']}' is malicious, don't click it.\nHere is a list of antiviruses that listed it as malicious: ```json\n{json.dumps(antivirusFlags, indent=3)}\n```"
         }
 
     # Otherwise, return a success message.
     else:
         return {
-            'status': clean
+            'status': clean,
+            'message': f"The url '{analysis['meta']['url_info']['url']}' is safe"
         }
