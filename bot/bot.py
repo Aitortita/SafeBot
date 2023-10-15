@@ -38,6 +38,5 @@ class SafeBot(commands.Bot):
         result = await addGuild(guild.id)
         print(result)
 
-
     def run_bot(self):
         self.run(settings.DISCORD_API_TOKEN, root_logger=True)

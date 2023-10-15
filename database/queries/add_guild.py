@@ -11,16 +11,13 @@ async def addGuild(guild_id):
 
                 # Get all AbsoluteSafeDomains from the SafeDomain table
                 absolute_safe_domains = await session.execute(select(SafeDomain).where(SafeDomain.domain_name.in_(domainList)))
-                for domain in absolute_safe_domains:
-                    print(f"absolute_safe_domains: {domain}")
 
-                # Associate guild with all AbsoluteSafeDomains
-                guild.safe_domains.extend(absolute_safe_domains)
-
+                # Associate SafeDomains with the Guild
+                guild.safe_domains.extend(absolute_safe_domains.scalars().all())
                 # Add the guild to the session and commit
                 session.add(guild)
                 await session.commit()
 
-                return "Guild added successfully."
+                return f"Guild {guild_id} added successfully."
             except Exception as error:
                 print(error)

@@ -18,7 +18,7 @@ class ConfigCommands(commands.Cog):
     async def add_safe_domain(self, ctx: commands.Context, text_to_send: str):
         result = await addSafeDomain(ctx.guild.id, text_to_send)
         if result:
-            await ctx.send(f"the domain '{result}' was added successfully to your safe domains, this means we will now ignore this domain with our automatic scans")
+            await ctx.send(f"The domain '{result}' was added successfully to your safe domains, this means we will now ignore this domain with our automatic scans")
         else:
-            await ctx.send("An error ocurred, we recommend sending this to support at our discord")
+            await ctx.send("An error ocurred, we recommend sending this to the support at our discord")
             

@@ -24,7 +24,7 @@ async_session = async_sessionmaker(bind=engine, expire_on_commit=False)
 async def initializeDatabase():
     try:
         async with engine.begin() as conn:
-            await conn.run_sync(Base.metadata.drop_all) # This drops the tables from the database
+            # await conn.run_sync(Base.metadata.drop_all) # This drops the tables from the database
             await conn.run_sync(Base.metadata.create_all) # This creates the tables defined in your models
             logger.info(f"DB: all models have been created")
 
