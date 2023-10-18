@@ -5,7 +5,7 @@ from database.models import Base
 import uuid
 
 if TYPE_CHECKING:
-    from . import SafeDomain
+    from . import WhitelistedDomain
 
 class Guild(Base):
     __tablename__ = 'guilds'
@@ -14,8 +14,8 @@ class Guild(Base):
     guild_id: Mapped[int] = mapped_column(BigInteger, unique=True, nullable=False)
 
     # Define the many-to-many relationship to safe_domains
-    safe_domains: Mapped[List["SafeDomain"]] = relationship(
-        secondary="guilds_safe_domains",
+    whitelisted_domains: Mapped[List["WhitelistedDomain"]] = relationship(
+        secondary="guilds_whitelisted_domains",
         back_populates="guilds"
         )
     
