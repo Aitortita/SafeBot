@@ -4,7 +4,7 @@ import discord
 from discord.ext import commands
 from bot.commands import NormalCommands, ScanCommands, ConfigCommands
 from bot.messages import AutomaticScans
-from database import initializeDatabase
+from database import initializeDatabase, initializeGuilds
 from database.queries import addGuild
 
 logger = getLogger("bot")
@@ -23,6 +23,8 @@ class SafeBot(commands.Bot):
 
     async def on_ready(self):
         await initializeDatabase()
+        await initializeGuilds([guild async for guild in self.fetch_guilds(limit=None)])
+        
         logger.info(f"Bot: {self.user} (ID: {self.user.id}) is now running")
         await self.change_presence(status=discord.Status.idle, activity=discord.Game("Protecting you"))
 

@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 from discord import app_commands
-from database.queries import addSafeDomain
+from database.queries import addWhitelistedDomain
 
 # Cog modularization for NormalCommands 
 class ConfigCommands(commands.Cog):
@@ -10,15 +10,16 @@ class ConfigCommands(commands.Cog):
         self.__cog_name__= "Config commands"
 
     @commands.hybrid_command(
-    description="Adds a domain to the list of domains to ignore",
+    description="Adds a domain to the whitelist, ensuring it won't be scanned automatically.",
     with_app_command=True
     )
     @app_commands.describe(text_to_send="example.com")
     @app_commands.rename(text_to_send="domain_to_add")
-    async def add_safe_domain(self, ctx: commands.Context, text_to_send: str):
-        result = await addSafeDomain(ctx.guild.id, text_to_send)
+    async def whitelist_domain(self, ctx: commands.Context, text_to_send: str):
+        """Adds a domain to the whitelist, ensuring it won't be scanned automatically."""
+        result = await addWhitelistedDomain(ctx.guild.id, text_to_send)
         if result:
-            await ctx.send(f"The domain '{result}' was added successfully to your safe domains, this means we will now ignore this domain with our automatic scans")
+            await ctx.send(result)
         else:
-            await ctx.send("An error ocurred, we recommend sending this to the support at our discord")
+            await ctx.send("An error ocurred, we recommend sending this to the support at our discord which you can find by running /invite")
             

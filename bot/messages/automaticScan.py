@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 from utils.functions import extract_urls, scan_urls, extractDomainsFromUrls, extractDomain
-from database.queries import checkIfSafeDomain
+from database.queries import checkIfWhitelistedDomain
 
 # Cog modularization for AutomaticScans
 class AutomaticScans(commands.Cog):
@@ -28,7 +28,7 @@ class AutomaticScans(commands.Cog):
         if (not urls):
             return
         domains = extractDomainsFromUrls(urls)
-        unsafe_domains = await checkIfSafeDomain(message.guild.id, domains)
+        unsafe_domains = await checkIfWhitelistedDomain(message.guild.id, domains)
         if (not unsafe_domains):
             return
         filtered_urls = [url for url in urls if extractDomain(url) in unsafe_domains]

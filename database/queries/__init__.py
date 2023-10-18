@@ -1,9 +1,9 @@
-from .add_safe_domain import addSafeDomain
+from .add_whitelisted_domain import addWhitelistedDomain
 from .add_guild import addGuild
-from .check_if_safe_domain import checkIfSafeDomain
+from .check_if_whitelisted_domain import checkIfWhitelistedDomain
 
 __all__ = [
-    "addSafeDomain",
+    "addWhitelistedDomain",
     "addGuild",
-    "checkIfSafeDomain",
+    "checkIfWhitelistedDomain",
 ]
