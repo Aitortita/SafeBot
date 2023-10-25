@@ -15,4 +15,4 @@ jobs:
 
       - name: Redeploy application
         run: |
-          ssh -i ${{ secrets.SSH_PRIVATE_KEY }} ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} "cd /root/safebot && git pull origin master && source venv/bin/activate && pip install -r requirements.txt && python main.py"
+          ssh -o StrictHostKeyChecking=no -i ${{ secrets.SSH_PRIVATE_KEY }} ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} "cd /root/safebot && git pull origin master && source venv/bin/activate && pip install -r requirements.txt && nohup python main.py > logs/infos.log 2>&1 &"
