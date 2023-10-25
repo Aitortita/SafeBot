@@ -23,29 +23,29 @@ async_session = async_sessionmaker(bind=engine, expire_on_commit=False)
 
 # Run an asynchronous function to create tables in the database
 async def initializeDatabase():
-    try:
-        async with engine.begin() as conn:
+    async with engine.begin() as conn:
+        try:
             # await conn.run_sync(Base.metadata.drop_all) # This drops the tables from the database
             await conn.run_sync(Base.metadata.create_all) # This creates the tables defined in your models
             logger.info(f"DB: all models have been created")
             await conn.commit()
+        except Exception as error:
+            await conn.rollback()
+            print(error)
+        finally:
+            await conn.close()
 
-        async with async_session() as session:
-            async with session.begin():
-                try:
-                    # Bulk creates a base list of safe domains
-                    session.add_all(baseWhitelistedDomains)
-                    await session.commit()
-                except Exception as error:
-                    await session.rollback()
-                    print(error)
-                finally:
-                    await session.close()
-    except Exception as error:
-        await conn.rollback()
-        print(error)
-    finally:
-        await conn.close()
+    async with async_session() as session:
+        async with session.begin():
+            try:
+                # Bulk creates a base list of safe domains
+                session.add_all(baseWhitelistedDomains)
+                await session.commit()
+            except Exception as error:
+                await session.rollback()
+                print(error)
+            finally:
+                await session.close()
 
 import discord
 import uuid
