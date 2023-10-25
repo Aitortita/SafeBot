@@ -1,0 +1,18 @@
+name: Auto Redeploy
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  redeploy:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Redeploy application
+        run: |
+          ssh -i ${{ secrets.SSH_PRIVATE_KEY }} ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} "cd /root/safebot && git pull origin master && source venv/bin/activate && pip install -r requirements.txt && python main.py"
