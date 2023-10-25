@@ -24,5 +24,6 @@ jobs:
             cd /root/safebot
             git pull origin master
             source venv/bin/activate
+            pkill -f "python main.py"
             pip install -r requirements.txt
             nohup python main.py > logs/infos.log 2>&1 &
