@@ -21,7 +21,7 @@ jobs:
       - name: Install PM2
         run: |
           npm install pm2 -g
-          npm bin -g
+          pm2 -version
 
       - name: Redeploy application
         uses: appleboy/ssh-action@master
