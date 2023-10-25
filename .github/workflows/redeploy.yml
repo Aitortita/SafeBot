@@ -13,11 +13,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: 20.9.0
-
       - name: Redeploy application
         uses: appleboy/ssh-action@master
         with:
@@ -26,8 +21,9 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
           script: | 
-            npm install pm2 -g
-            pm2 -version
+            curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
+            sudo apt-get install -y nodejs
+            npm install -g pm2
             cd /root/safebot
             source venv/bin/activate
             git pull origin master
