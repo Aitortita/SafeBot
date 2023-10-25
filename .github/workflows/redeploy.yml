@@ -12,10 +12,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-       
-      - name: Debug Secret
-        run: echo "SSH Private Key:${{{ secrets.SSH_PRIVATE_KEY }}}"
-
 
       - name: Redeploy application
         run: |
