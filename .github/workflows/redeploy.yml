@@ -13,6 +13,14 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 20.9.0
+
+      - name: Install PM2
+        run: npm install pm2 -g
+
       - name: Redeploy application
         uses: appleboy/ssh-action@master
         with:
@@ -25,4 +33,4 @@ jobs:
             source venv/bin/activate
             git pull origin master
             pip install -r requirements.txt
-            /root/.nvm/versions/node/v20.9.0/lib/node_modules/pm2/bin/pm2 restart safebot
+            pm2 restart safebot
