@@ -22,8 +22,7 @@ jobs:
           port: 22
           script: | 
             cd /root/safebot
-            git pull origin master
             source venv/bin/activate
-            pkill -f "python main.py"
+            git pull origin master
             pip install -r requirements.txt
-            nohup python main.py > logs/infos.log 2>&1 &
+            pm2 restart safebot
