@@ -16,7 +16,7 @@ DBNAME = settings.DBNAME
 db_url = f"postgresql+asyncpg://{DBUSER}:{DBPASSWORD}@{DBHOST}/{DBNAME}"
 
 # Create the SQLAlchemy engine
-engine = create_async_engine(db_url, echo=True)
+engine = create_async_engine(db_url)
 
 # Create a sessionmaker that produces async sessions
 async_session = async_sessionmaker(bind=engine, expire_on_commit=False)
@@ -27,7 +27,7 @@ async def initializeDatabase():
         try:
             # await conn.run_sync(Base.metadata.drop_all) # This drops the tables from the database
             await conn.run_sync(Base.metadata.create_all) # This creates the tables defined in your models
-            logger.info(f"DB: all models have been created")
+            logger.info(f"All DB models have been created")
             await conn.commit()
         except Exception as error:
             await conn.rollback()
@@ -49,29 +49,32 @@ async def initializeDatabase():
 
 import discord
 import uuid
-async def initializeGuilds(fetched_guilds: list[discord.Guild]) -> None:
+async def initializeGuilds(discord_guilds: list[discord.Guild]) -> None:
     """ fetches all guilds and creates a database row for each one
     """
     async with async_session() as session:
         async with session.begin():
             try:
                 # Get all AbsoluteWhitelistedDomains from the WhitelistedDomain table
-                base_whitelisted_domains = await session.execute(select(WhitelistedDomain).where(WhitelistedDomain.domain_name.in_(domainList)))
-                print("post base_whitelist query")
+                base_whitelisted_domains = (await session.execute(select(WhitelistedDomain).where(WhitelistedDomain.domain_name.in_(domainList)))).scalars().all()
+
+                # Get all stored9 guilds
+                stored_guilds = (await session.execute(select(Guild).where(Guild.guild_id.in_(discord_guilds)))).scalars().all()
+
+                # Filter unstored guilds
+                stored_guilds_ids = [guild.guild_id for guild in stored_guilds]
+                unstored_guilds = [guild_id for guild_id in discord_guilds if guild_id not in stored_guilds_ids]
 
                 # Create new guild
-                guilds = [Guild(id=str(uuid.uuid4()),guild_id=guild.id) for guild in fetched_guilds]
-                print(f"post guild creation: {guilds}")
+                guilds = [Guild(id=str(uuid.uuid4()),guild_id=guild_id) for guild_id in unstored_guilds]
 
                 # Associate whitelisted domains with each guild
                 for guild in guilds:
-                    guild.whitelisted_domains.extend(base_whitelisted_domains.scalars().all())
-                print(f"post guild extension")
-
-                # Add the guild to the session and commit
+                    guild.whitelisted_domains.extend(base_whitelisted_domains)
+                    logger.info(f"guild: {guild}")
+                
                 session.add_all(guilds)
                 await session.commit()
-                print("post commit")
             except Exception as error:
                 print(error)
             finally:

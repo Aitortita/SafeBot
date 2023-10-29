@@ -23,7 +23,7 @@ class SafeBot(commands.Bot):
 
     async def on_ready(self):
         await initializeDatabase()
-        await initializeGuilds([guild async for guild in self.fetch_guilds(limit=None)])
+        await initializeGuilds([guild.id async for guild in self.fetch_guilds(limit=None)])
         
         logger.info(f"Bot: {self.user} (ID: {self.user.id}) is now running")
         await self.change_presence(status=discord.Status.idle, activity=discord.Game("Protecting you"))
