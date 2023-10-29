@@ -1,6 +1,7 @@
 import os
 from logging.config import dictConfig
 from dotenv import load_dotenv
+from colorlog import ColoredFormatter
 
 load_dotenv()
 
@@ -16,12 +17,17 @@ LOGGING_CONFIG = {
     "version": 1,
     "disabled_existing_Loggers": False,
     "formatters": {
-        "verbose": {
-            "format": "%(levelname)-10s - %(asctime)s - %(module)-15s : %(message)s"
-        },
         "standard": {
-            "format": "%(levelname)-10s - %(name)-15s : %(message)s"
-        }
+            "()": 'colorlog.ColoredFormatter',
+            "format": "%(log_color)s%(levelname)s - %(asctime)s - %(name)s : %(message)s",
+            "log_colors": {
+                "DEBUG": "cyan",
+                "INFO": "white",
+                "WARNING": "yellow",
+                "ERROR": "red",
+                "CRITICAL": "bold_red"
+            }
+        },
     },
     "handlers": {
         "console": {
@@ -29,28 +35,29 @@ LOGGING_CONFIG = {
             'class': "logging.StreamHandler",
             'formatter': "standard"
         },
-        "console2": {
-            'level': "DEBUG",
-            'class': "logging.StreamHandler",
-            'formatter': "standard"
-        },
         "file": {
             'level': "DEBUG",
             'class': "logging.FileHandler",
+            'formatter': 'standard',
             'filename': "logs/infos.log",
             'mode': "w"
         },
     },
     "loggers": {
         "bot": {
-            'handlers': ['console'],
+            'handlers': ['console', 'file'],
             'level': "INFO",
             "propagate": False
         },
         "discord": {
-            'handlers': ['console2', "file"],
+            'handlers': ['console', 'file'],
             "level": "INFO",
             "propagate": False
+        },
+        "sqlalchemy.engine": {
+            'handlers': ['console', 'file'],
+            'level': 'INFO',
+            'propagate': False
         }
     }
 }

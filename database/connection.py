@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 from database.models import Base, Guild, WhitelistedDomain
 from database import baseWhitelistedDomains, domainList
 from sqlalchemy import select
-logger = getLogger("bot")
+logger = getLogger("sqlalchemy.engine")
 
 # variables for database connection
 DBUSER = settings.DBUSER
@@ -55,8 +55,6 @@ async def initializeGuilds(fetched_guilds: list[discord.Guild]) -> None:
     async with async_session() as session:
         async with session.begin():
             try:
-                print("inicio")
-
                 # Get all AbsoluteWhitelistedDomains from the WhitelistedDomain table
                 base_whitelisted_domains = await session.execute(select(WhitelistedDomain).where(WhitelistedDomain.domain_name.in_(domainList)))
                 print("post base_whitelist query")
