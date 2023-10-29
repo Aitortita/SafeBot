@@ -58,7 +58,7 @@ async def initializeGuilds(discord_guilds: list[discord.Guild]) -> None:
                 # Get all AbsoluteWhitelistedDomains from the WhitelistedDomain table
                 base_whitelisted_domains = (await session.execute(select(WhitelistedDomain).where(WhitelistedDomain.domain_name.in_(domainList)))).scalars().all()
 
-                # Get all stored9 guilds
+                # Get all stored guilds
                 stored_guilds = (await session.execute(select(Guild).where(Guild.guild_id.in_(discord_guilds)))).scalars().all()
 
                 # Filter unstored guilds
@@ -71,11 +71,11 @@ async def initializeGuilds(discord_guilds: list[discord.Guild]) -> None:
                 # Associate whitelisted domains with each guild
                 for guild in guilds:
                     guild.whitelisted_domains.extend(base_whitelisted_domains)
-                    logger.info(f"guild: {guild}")
                 
                 session.add_all(guilds)
                 await session.commit()
             except Exception as error:
-                print(error)
+                await session.rollback()
+                logger.error(error)
             finally:
                 await session.close()
