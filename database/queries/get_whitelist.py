@@ -4,18 +4,17 @@ from sqlalchemy import select
 from logging import getLogger
 logger = getLogger('sqlalchemy.engine')
 
-async def checkIfWhitelistedDomain(guild_id: int, domains: list[str]) -> list[str]:
+async def getWhitelist(guild_id: int) -> list[str]:
     async with async_session() as session:
         async with session.begin():
             try:
-                whitelisted_domains_query = await session.execute(
+                whitelisted_domains_query = (await session.execute(
                     select(WhitelistedDomain)
                     .join_from(Guild, Guild.whitelisted_domains)
                     .where(Guild.guild_id == guild_id)
-                )
-                whitelisted_domains = [domain.domain_name for domain in whitelisted_domains_query.scalars().all()]
-                unwhitelisted_domains = [domain for domain in domains if domain not in whitelisted_domains]
-                return unwhitelisted_domains
+                )).scalars().all()
+                whitelisted_domains = [domain.domain_name for domain in whitelisted_domains_query]
+                return whitelisted_domains
             except Exception as error:
                 await session.rollback()
                 logger.error(error)

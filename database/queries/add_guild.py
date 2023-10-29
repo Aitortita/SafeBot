@@ -1,6 +1,8 @@
 from database.models import Guild, WhitelistedDomain
 from database import async_session, domainList
 from sqlalchemy import select
+from logging import getLogger
+logger = getLogger('sqlalchemy.engine')
 
 async def addGuild(guild_id):
     async with async_session() as session:
@@ -22,6 +24,6 @@ async def addGuild(guild_id):
                 return f"Guild {guild_id} added successfully."
             except Exception as error:
                 await session.rollback()
-                print(error)
+                logger.error(error)
             finally:
                 await session.close()

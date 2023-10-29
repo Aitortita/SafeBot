@@ -2,6 +2,8 @@ from database.models import Guild, WhitelistedDomain
 from database import async_session
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
+from logging import getLogger
+logger = getLogger('sqlalchemy.engine')
 
 async def addWhitelistedDomain(guild_id: int, domain_name: str) -> str:
     async with async_session() as session:
@@ -34,6 +36,6 @@ async def addWhitelistedDomain(guild_id: int, domain_name: str) -> str:
                 return f"The domain '{domain.domain_name}' was added successfully to your whitelisted domains, this means we will now ignore this domain with our automatic scans"
             except Exception as error:
                 await session.rollback()
-                print(error)
+                logger.error(error)
             finally:
                 await session.close()
