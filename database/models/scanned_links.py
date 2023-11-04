@@ -3,7 +3,6 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from enum import Enum as PyEnum
 from datetime import datetime
 from typing import TYPE_CHECKING
-import uuid
 from . import Base
 
 if TYPE_CHECKING:
@@ -16,7 +15,6 @@ class ScanResultEnum(PyEnum):
 class ScannedLink(Base):
     __tablename__ = 'scanned_links'
 
-    id: Mapped[str]= mapped_column(String(36), default=str(uuid.uuid4()), unique=True, primary_key=True, nullable=False)
     url: Mapped[str]= mapped_column(String, nullable=False)
     scan_result: Mapped[PyEnum]= mapped_column(Enum(ScanResultEnum), nullable=False)
     timestamp: Mapped[datetime]= mapped_column(server_default=func.now(), nullable=False)

@@ -1,3 +1,7 @@
-from sqlalchemy.orm import DeclarativeBase
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
+from sqlalchemy.dialects.postgresql import UUID
+import uuid
 class Base(DeclarativeBase):
-    pass
+    __abstract__ = True
+
+    id: Mapped[str] = mapped_column(UUID(as_uuid=True), default=uuid.uuid4, unique=True, primary_key=True, nullable=False)
