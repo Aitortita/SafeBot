@@ -4,6 +4,7 @@ __pycache__
 
 ### Environment ###
 .env
+.env copy
 
 ### Virtual Environment ###
 venv/
