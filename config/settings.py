@@ -1,7 +1,7 @@
 import os
 from logging.config import dictConfig
 from dotenv import load_dotenv
-from colorlog import ColoredFormatter
+import colorlog
 
 load_dotenv()
 
@@ -15,10 +15,10 @@ DBNAME: str = os.getenv("DBNAME")
 
 LOGGING_CONFIG = {
     "version": 1,
-    "disabled_existing_Loggers": False,
+    "disabled_existing_loggers": False,
     "formatters": {
         "standard": {
-            "()": 'colorlog.ColoredFormatter',
+            "()": "colorlog.ColoredFormatter",
             "format": "%(log_color)s%(levelname)s - %(asctime)s - %(name)s : %(message)s",
             "log_colors": {
                 "DEBUG": "cyan",
@@ -31,33 +31,45 @@ LOGGING_CONFIG = {
     },
     "handlers": {
         "console": {
-            'level': "DEBUG",
-            'class': "logging.StreamHandler",
-            'formatter': "standard"
+            "level": "DEBUG",
+            "class": "logging.StreamHandler",
+            "formatter": "standard"
         },
         "file": {
-            'level': "DEBUG",
-            'class': "logging.FileHandler",
-            'formatter': 'standard',
-            'filename': "logs/infos.log",
-            'mode': "w"
+            "level": "DEBUG",
+            "class": "logging.FileHandler",
+            "formatter": "standard",
+            "filename": "logs/infos.log",
+            "mode": "w"
         },
+        "scan": {
+            "level": "DEBUG",
+            "class": "logging.FileHandler",
+            "formatter": "standard",
+            "filename": "logs/scans.log",
+            "mode": "w"
+        }
     },
     "loggers": {
+        "scans": {
+            "handlers": ["console", "file", "scan"],
+            "level": "INFO",
+            "propagate": False
+        },
         "bot": {
-            'handlers': ['console', 'file'],
-            'level': "INFO",
+            "handlers": ["console", "file"],
+            "level": "INFO",
             "propagate": False
         },
         "discord": {
-            'handlers': ['console', 'file'],
+            "handlers": ["console", "file"],
             "level": "INFO",
             "propagate": False
         },
         "sqlalchemy.engine": {
-            'handlers': ['console', 'file'],
-            'level': 'INFO',
-            'propagate': False
+            "handlers": ["console", "file"],
+            "level": "INFO",
+            "propagate": False
         }
     }
 }

@@ -9,9 +9,9 @@ from database.queries import addGuild
 
 logger = getLogger("bot")
 
-intents = discord.Intents.default()  # Create a default intents instance
-intents.typing = False  # Disable the typing event
-intents.presences = False  # Disable presence-related events
+intents = discord.Intents.default()
+intents.typing = False
+intents.presences = False
 intents.message_content = True
 intents.guilds = True
 
@@ -25,7 +25,7 @@ class SafeBot(commands.Bot):
         await initializeDatabase()
         await initializeGuilds([guild.id async for guild in self.fetch_guilds(limit=None)])
         
-        logger.info(f"Bot: {self.user} (ID: {self.user.id}) is now running")
+        logger.info(f"{self.user} (ID: {self.user.id}) is now running")
         await self.change_presence(status=discord.Status.idle, activity=discord.Game("Protecting you"))
 
         # Add cogs and await the add_cog methods

@@ -1,26 +1,37 @@
 import json
+from logging import getLogger
+logger = getLogger("bot")
 
-malicious: str = 'malicious'
-clean: str = 'clean'
+def handle_vt_analysis(analysis: json, name: str, type: str) -> dict:
+    """
+    Handles the Virustotal analysis response, filtering every malicious/suspicious
+    evaluations and returning a dict containing the veredict in the form of a status and message 
 
-def handle_vt_analysis(analysis: json) -> dict:
+    Args:
+        analysis: the analysis response in the form of a json.
+        name: the name of the file/url in the form of a string.
+        type: the type of the object scanned, in the form of a url or a file.
+
+    Returns:
+        A Dict containing the final result of the Safebot scan.
+    """
     # Initialize a dictionary to store the antivirus flags.
     antivirusFlags = {}
     # Check if the analysis found any malicious results.
-    for antivirus, detection_result in analysis['data']['attributes']['results'].items():
-        if detection_result["result"] == "phishing" or detection_result["result"] == "malicious":
-            antivirusFlags[antivirus] = detection_result["result"]
+    for antivirus, evaluation in analysis['data']['attributes']['results'].items():
+        if evaluation["category"] in ["malicious", "suspicious"]:
+            antivirusFlags[antivirus] = evaluation["result"]
 
-    # If any malicious results were found, return an error message.
+    # If any malicious results were found, return a message containing the antiviruses that flagged it as malicious and their results.
     if len(antivirusFlags) >= 1:
         return {
-            'status': malicious,
-            'message': f"The url '{analysis['meta']['url_info']['url']}' is malicious, don't click it.\nHere is a list of antiviruses that listed it as malicious: ```json\n{json.dumps(antivirusFlags, indent=3)}\n```"
+            'status': 'malicious',
+            'message': f"The {type} '{name}' is malicious.\nHere is a list of antiviruses that flagged it as malicious: ```json\n{json.dumps(antivirusFlags, indent=3)}\n```"
         }
 
-    # Otherwise, return a success message.
+    # Otherwise, return a clean message.
     else:
         return {
-            'status': clean,
-            'message': f"The url '{analysis['meta']['url_info']['url']}' is safe"
+            'status': 'clean',
+            'message': f"The {type} '{name}' is safe"
         }

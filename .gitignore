@@ -3,12 +3,9 @@
 __pycache__
 
 ### Environment ###
-.env
-.env copy
+.env*
 
 ### Virtual Environment ###
 venv/
 
-.log
-logs/.logs
-logs/infos.log
+*.log
