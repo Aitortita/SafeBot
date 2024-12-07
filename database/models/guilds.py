@@ -1,5 +1,5 @@
 from typing import List, TYPE_CHECKING
-from sqlalchemy import BigInteger
+from sqlalchemy import BigInteger, Boolean
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from database.models import Base
 
@@ -10,6 +10,7 @@ class Guild(Base):
     __tablename__ = 'guilds'
 
     guild_id: Mapped[int] = mapped_column(BigInteger, unique=True, nullable=False)
+    quiet: Mapped[bool] = mapped_column(Boolean, default=False)
 
     # Define the many-to-many relationship to safe_domains
     whitelisted_domains: Mapped[List["WhitelistedDomain"]] = relationship(

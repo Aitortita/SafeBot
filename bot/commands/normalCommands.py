@@ -11,7 +11,6 @@ class InviteButtons(discord.ui.View):
         async def inviteBtn(self, interaction: discord.Interaction, button: discord.ui.Button):
             await interaction.response.send_message(self.inv, ephemeral=True)
 
-# Cog modularization for NormalCommands 
 class NormalCommands(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
@@ -25,5 +24,6 @@ class NormalCommands(commands.Cog):
 
     @commands.hybrid_command()
     async def ping(self, ctx: commands.Context):
-        """Answers with 'pong'."""
-        await ctx.send("pong")
+        """Answers with a latency tested 'pong'."""
+        latency = self.bot.latency * 1000
+        await ctx.send(f"""Pong.\nIt took me {round(latency)} ms to answer""")

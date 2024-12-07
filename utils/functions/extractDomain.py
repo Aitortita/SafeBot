@@ -1,7 +1,7 @@
 from urllib.parse import urlparse
 
 # Function to extract domain from URL
-def extractDomain(url: str) -> str:
+def extract_domain(url: str) -> str:
     parsed_url = urlparse(url)
     # Get the netloc (domain) from the parsed URL
     domain = parsed_url.netloc

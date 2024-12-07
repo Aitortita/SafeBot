@@ -1,7 +1,7 @@
 from urllib.parse import urlparse
 
 # function to extract urls from user's messages
-def extractDomainsFromUrls(urls: list[str]) -> list[str]:
+def extract_domains_from_urls(urls: list[str]) -> list[str]:
     domains = []
     for url in urls:
         parsed_url = urlparse(url)

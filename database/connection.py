@@ -25,8 +25,10 @@ async_session = async_sessionmaker(bind=engine, expire_on_commit=False)
 async def initializeDatabase():
     async with engine.begin() as conn:
         try:
-            # await conn.run_sync(Base.metadata.drop_all) # This drops the tables from the database
-            await conn.run_sync(Base.metadata.create_all) # This creates the tables defined in your models
+            # This drops the tables from the database
+            # await conn.run_sync(Base.metadata.drop_all) 
+            # Creates the tables defined in your models
+            await conn.run_sync(Base.metadata.create_all)
             logger.info(f"All DB models have been created")
             await conn.commit()
         except Exception as error:
@@ -50,7 +52,8 @@ async def initializeDatabase():
 import discord
 import uuid
 async def initializeGuilds(discord_guilds: list[discord.Guild]) -> None:
-    """ fetches all guilds and creates a database row for each one
+    """ 
+    Fetches all guilds and creates a row for each one
     """
     async with async_session() as session:
         async with session.begin():

@@ -1,7 +1,6 @@
 from discord.ext import commands
 from discord import app_commands
 
-# Cog modularization for ScanCommands 
 class ScanCommands(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
