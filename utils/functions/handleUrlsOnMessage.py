@@ -15,7 +15,7 @@ async def handle_urls_on_message(message: discord.Message, urls: list[str], bot_
                     await message.channel.send(result['message'])
         else:
             await message.add_reaction('🔍')
-            results = await scan_urls(message.attachments)
+            results = await scan_urls(urls)
             await message.remove_reaction('🔍', bot_user)
             for result in results:
                 if result['status'] == 'clean':

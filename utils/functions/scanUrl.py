@@ -29,7 +29,7 @@ async def scan_url(url: str) -> dict:
             response = await session.get(f"https://www.virustotal.com/api/v3/urls/{url_id}", headers=headers)
 
             if(response.status == 200):
-                scans.info(f"Scanning url:{url}")
+                scans.info(f"Scanning url: {url}")
                 # If the request was successful it means that an already made analysis exists, so we need to ask VirusTotal to reanalize the URL in order to check if there have been any new discoveries to potential maliciousness.
                 analysis = await session.post(f"https://www.virustotal.com/api/v3/urls/{url_id}/analyse", headers=headers)
                 analysis_json = await analysis.json()
@@ -46,7 +46,7 @@ async def scan_url(url: str) -> dict:
                     return handle_vt_analysis(response_json, url, 'url')
             # If the request fails it means that there is no current analysis of the URL inside of VirusTotal Database
             else:
-                scans.info(f"Scanning url:{url} for the first time")
+                scans.info(f"Scanning url: {url} for the first time")
                 # Ask for a new analysis of the URL
                 analysis = await session.post("https://www.virustotal.com/api/v3/urls", data={ "url": url }, headers={
                     "accept": "application/json",
