@@ -26,7 +26,7 @@ class SafeBot(commands.Bot):
         await initializeGuilds([guild.id async for guild in self.fetch_guilds(limit=None)])
         
         logger.info(f"{self.user} (ID: {self.user.id}) is now running")
-        await self.change_presence(status=discord.Status.idle, activity=discord.Game("Protecting you"))
+        await self.change_presence(status=discord.Status.online, activity=discord.Game("Protecting you.\nCommand prefix: >"))
 
         # Add cogs and await the add_cog methods
         await self.add_cog(NormalCommands(self))
