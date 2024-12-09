@@ -1,9 +1,9 @@
-from logging import getLogger
 from config import settings
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 from database.models import Base, Guild, WhitelistedDomain
 from database import baseWhitelistedDomains, domainList
-from sqlalchemy import select, event
+from sqlalchemy import select
+from logging import getLogger
 logger = getLogger("sqlalchemy.engine")
 
 # variables for database connection
@@ -16,17 +16,7 @@ DBNAME = settings.DBNAME
 db_url = f"postgresql+asyncpg://{DBUSER}:{DBPASSWORD}@{DBHOST}/{DBNAME}"
 
 # Create the SQLAlchemy engine
-engine = create_async_engine(db_url, pool_pre_ping=True, pool_recycle=3600)
-sync_engine = engine.sync_engine
-
-@event.listens_for(sync_engine, "connect")
-def on_connect(dbapi_connection, connection_record):
-    logger.info("Connection established.")
-
-@event.listens_for(sync_engine, "engine_disposed")
-def on_disconnect(dbapi_connection, connection_record):
-    logger.info("Connection finished.")
-    
+engine = create_async_engine(db_url, pool_recycle=3600)
 
 # Create a sessionmaker that produces async sessions
 async_session = async_sessionmaker(bind=engine, expire_on_commit=False)
