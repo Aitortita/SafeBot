@@ -39,7 +39,7 @@ async def scan_url(url: str) -> dict:
                     response = await session.get(f"https://www.virustotal.com/api/v3/analyses/{analysis_json['data']['id']}", headers=headers)
                     response_json = await response.json()
                     while response_json['data']['attributes']['status'] == 'queued':
-                        await asyncio.sleep(2)
+                        await asyncio.sleep(10)
                         response = await session.get(f"https://www.virustotal.com/api/v3/analyses/{analysis_json['data']['id']}", headers=headers)
                         response_json = await response.json()
                         
@@ -60,7 +60,7 @@ async def scan_url(url: str) -> dict:
                     response = await session.get(f"https://www.virustotal.com/api/v3/analyses/{analysis_json['data']['id']}", headers=headers)
                     response_json = await response.json()
                     while response_json['data']['attributes']['status'] == 'queued':
-                        await asyncio.sleep(2)
+                        await asyncio.sleep(10)
                         response = await session.get(f"https://www.virustotal.com/api/v3/analyses/{analysis_json['data']['id']}", headers=headers)
                         response_json = await response.json()
 

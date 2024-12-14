@@ -39,7 +39,7 @@ async def scan_file(file: discord.Attachment, fileHash: str) -> dict:
                     response_json = await response.json()
                     # Constantly ask virustotal if the analysis has finished
                     while response_json['data']['attributes']['status'] == 'queued':
-                        await asyncio.sleep(2)
+                        await asyncio.sleep(10)
                         response = await session.get(f"https://www.virustotal.com/api/v3/analyses/{analysis_json['data']['id']}", headers=headers)
                         response_json = await response.json()
                     # If it finished the analysis we then move to handle the response
@@ -86,7 +86,7 @@ async def scan_file(file: discord.Attachment, fileHash: str) -> dict:
                     response = await session.get(f"https://www.virustotal.com/api/v3/analyses/{analysis_json['data']['id']}", headers=headers)
                     response_json = await response.json()
                     while response_json['data']['attributes']['status'] == 'queued':
-                        await asyncio.sleep(2)
+                        await asyncio.sleep(10)
                         response = await session.get(f"https://www.virustotal.com/api/v3/analyses/{analysis_json['data']['id']}", headers=headers)
                         response_json = await response.json()
 
