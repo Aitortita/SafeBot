@@ -25,5 +25,4 @@ async def handle_files_on_message(message: discord.Message, bot_user):
                     await message.channel.send(result['message'])
     except Exception as error:
         await message.add_reaction('❓')
-        await message.channel.send("There was an error scanning your file, try again later")
         bot.info(error)

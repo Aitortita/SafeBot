@@ -25,5 +25,4 @@ async def handle_urls_on_message(message: discord.Message, urls: list[str], bot_
                     await message.channel.send(result['message'])
     except Exception as error:
         await message.add_reaction('❓')
-        await message.channel.send("There was an error scanning your link, try again later")
         bot.info(error)
