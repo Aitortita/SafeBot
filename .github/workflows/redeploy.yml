@@ -21,7 +21,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 4532
           script: | 
-            cd /root/safebot
+            cd /root/apps/safebot
             source venv/bin/activate
             git pull origin master
             pip install -r requirements.txt
